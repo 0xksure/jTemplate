@@ -23,25 +23,31 @@ public class RequestParser {
     public String path;
 
 
-    private void parseHost(String s) throws IOException {
+    public void parseHost(String s) {
         if(s.startsWith("Host:")){
             Pattern r = Pattern.compile("(\\w+:\\d+)");
             Matcher m = r.matcher(s);
-            host = m.group();
+            if(m.find()){
+                host = m.group().strip();
+            }
+
         }
     }
 
-    private void parseConnection(String s) throws IOException{
+    public void parseConnection(String s) {
         if(s.startsWith("Connection:")){
-            connection = s.replace("Connection: ","");
+            connection = s.replace("Connection: ","").strip();
         }
     }
 
-    private void parsePath(String s) throws IOException {
+    public void parsePath(String s)  {
         if(s.startsWith("Referer:")){
             Pattern r = Pattern.compile("(\\/\\w+)+$");
             Matcher m = r.matcher(s);
-            path = m.group();
+            if(m.find()){
+                path = m.group().strip();
+            }
+
         }
     }
 
@@ -51,7 +57,6 @@ public class RequestParser {
             parseHost(input);
             parseConnection(input);
             parsePath(input);
-            System.out.printf("Got %s \n", input);
         }
     }
 }

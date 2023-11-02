@@ -4,12 +4,12 @@ import jakarta.annotation.Nullable;
 
 
 public class HelloWriter extends TemplateHandler{
-    private HtmlElement generated = null;
-    public HelloWriter(@Nullable HtmlElement generated){
+    public HelloWriter(@Nullable HtmlElement protoGenerated){
+        super(protoGenerated);
     }
 
-    public HelloWriter generate(){
-        generated = new Html("","",new Div("","hello"));
-        return new HelloWriter(generated);
+    public static HelloWriter generate(){
+        Html html= new Html("","",new Div("","hello"));
+        return new HelloWriter(html);
     }
 }

@@ -1,5 +1,9 @@
 package com.repository;
 
+import jakarta.annotation.Nullable;
+import org.w3c.dom.html.HTMLElement;
+
+import javax.swing.text.html.HTML;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,6 +13,18 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 
+class NotFoundHandler extends TemplateHandler {
+
+    public NotFoundHandler(@Nullable HtmlElement protoGenerated){
+        super(protoGenerated);
+    }
+
+    public static TemplateHandler generate(){
+        Html elem = new Html("","",new Div("","Not found"));
+        return new NotFoundHandler(elem);
+    }
+}
+
 public class JumpyServer {
     private HashMap<String, TemplateHandler> handlers = new HashMap<String, TemplateHandler>();
 
@@ -17,13 +33,13 @@ public class JumpyServer {
     }
 
     public void Attach(String path, TemplateHandler handler) {
-
             handlers.put(path, handler);
-
     }
 
     private TemplateHandler GetHandler(String path) {
-        return handlers.get(path);
+        TemplateHandler template = handlers.get(path);
+        if(path != null) return template;
+        return NotFoundHandler.generate();
     }
 
     public void Start() {
@@ -38,9 +54,11 @@ public class JumpyServer {
                     BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
                     headerParser.parseReader(in);
                     // call method
+                    System.out.printf("Path: %s \n",headerParser.path);
                     TemplateHandler handler = GetHandler(headerParser.path);
-                    String payload = handler.render();
 
+                    String html = handler.render();
+                    String payload = formatter.getPayload(html,200);
                     System.out.printf("Write back %s \n", payload);
                     out.write(payload);
                     out.close();
